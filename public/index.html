@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TYL Flow - Editor</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>TYL Flow — Editor</h1>
+    <nav>
+      <button id="btnAddSentence" type="button">New Sentence</button>
+      <button id="btnExport" type="button">Export JSON</button>
+      <button id="btnImport" type="button">Import JSON</button>
+      <input id="fileImport" type="file" accept="application/json" style="display:none" />
+      <a class="link" href="list.html">Open Overview</a>
+    </nav>
+  </header>
+
+  <main class="main">
+    <!-- Timeline -->
+    <section id="timeline" class="timeline" aria-label="Sentence timeline"></section>
+
+    <!-- Sentence Details -->
+    <section class="details">
+      <form id="sentenceForm">
+        <label>Sentence text
+          <textarea id="sentenceText" rows="2" placeholder="Write sentence here..." required></textarea>
+        </label>
+
+        <div class="row">
+          <label>Camera <input id="camera" placeholder="Canon R8"></label>
+          <label>Lens <input id="lens" placeholder="50mm"></label>
+          <label>Shot <input id="shot" placeholder="Wide"></label>
+        </div>
+
+        <div class="footage-controls">
+          <input id="footageInput" placeholder="Add footage ID, e.g. IMG_5994">
+          <button id="btnAddFootage" type="button">Add Footage</button>
+        </div>
+
+        <div id="footageList" class="footage-list" aria-live="polite"></div>
+
+        <div class="actions">
+          <!-- Only one Save All button -->
+          <button id="btnSave" type="submit">Save All & Back to Overview</button>
+          <button id="btnDelete" type="button" class="danger">Delete Sentence</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
