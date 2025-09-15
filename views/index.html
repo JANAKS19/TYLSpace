@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Projects - Home</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Video Projects</h1>
+        <a href="/new" class="button">New Video Project</a>
+        <table>
+            <thead>
+                <tr>
+                    <th>Project ID</th>
+                    <th>Sentence Count</th>
+                    <th>Last Modified</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="script-table-body">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/scripts')
+                .then(response => response.json())
+                .then(scripts => {
+                    const tableBody = document.getElementById('script-table-body');
+                    if (scripts.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="4">No projects saved yet.</td></tr>`;
+                        return;
+                    }
+
+                    // Group scripts by projectId
+                    const projects = scripts.reduce((acc, script) => {
+                        const { projectId, date } = script;
+                        if (!acc[projectId]) {
+                            acc[projectId] = { sentences: [], latestDate: date };
+                        }
+                        acc[projectId].sentences.push(script);
+                        if (new Date(date) > new Date(acc[projectId].latestDate)) {
+                            acc[projectId].latestDate = date;
+                        }
+                        return acc;
+                    }, {});
+
+                    tableBody.innerHTML = ''; 
+
+                    // Create a table row for each project group
+                    for (const projectId in projects) {
+                        const project = projects[projectId];
+                        const row = `
+                            <tr>
+                                <td>${projectId}</td>
+                                <td>${project.sentences.length} sentences</td>
+                                <td>${project.latestDate}</td>
+                                <td><a href="/manage?projectId=${projectId}">Open / Edit</a></td>
+                            </tr>
+                        `;
+                        tableBody.innerHTML += row;
+                    }
+                });
+        });
+    </script>
+</body>
+</html>

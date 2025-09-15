@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Manage Sentences</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 id="page-heading">Manage Script Sentences</h1>
+        <form id="manage-form">
+            <div id="sentence-container">
+                </div>
+            <button type="submit" id="save-button">Save Project</button>
+            <a href="/" style="margin-left: 10px;">Cancel</a>
+        </form>
+    </div>
+
+    <script>
+        // Helper function to render sentence forms
+        const renderSentenceForms = (sentences) => {
+            const container = document.getElementById('sentence-container');
+            container.innerHTML = '';
+            sentences.forEach((sentenceData, index) => {
+                const isString = typeof sentenceData === 'string';
+                const sentenceText = isString ? sentenceData : sentenceData.sentence;
+                const videoNumber = isString ? '' : sentenceData.videoNumber;
+                const details = isString ? '' : sentenceData.details;
+
+                const formGroup = `
+                    <div class="sentence-form-group">
+                        <p class="sentence-text" data-sentence="${sentenceText}">${index + 1}. ${sentenceText}</p>
+                        <label for="video-number-${index}">Video Number (Child):</label>
+                        <input type="text" id="video-number-${index}" value="${videoNumber}" placeholder="e.g., Scene_A1 (optional)">
+                        <label for="details-${index}">Details:</label>
+                        <input type="text" id="details-${index}" value="${details}" placeholder="e.g., Close up shot">
+                    </div>
+                `;
+                container.innerHTML += formGroup;
+            });
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectIdToEdit = urlParams.get('projectId');
+            
+            // --- EDIT MODE ---
+            if (projectIdToEdit) {
+                document.getElementById('page-title').textContent = `Edit Project: ${projectIdToEdit}`;
+                document.getElementById('page-heading').textContent = `Editing Project: ${projectIdToEdit}`;
+                document.getElementById('save-button').textContent = 'Update Project';
+
+                fetch(`/api/scripts/project/${projectIdToEdit}`)
+                    .then(response => response.json())
+                    .then(scripts => renderSentenceForms(scripts));
+            } 
+            // --- NEW SCRIPT MODE ---
+            else {
+                const scriptData = JSON.parse(localStorage.getItem('scriptData'));
+                if (scriptData && scriptData.sentences.length > 0) {
+                    document.getElementById('page-heading').textContent = `New Project: ${scriptData.projectId}`;
+                    renderSentenceForms(scriptData.sentences);
+                } else {
+                    document.getElementById('sentence-container').innerHTML = `<p>No script data found. <a href="/new">Start a new project</a>.</p>`;
+                }
+            }
+        });
+
+        document.getElementById('manage-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectIdToUpdate = urlParams.get('projectId');
+            
+            let parentProjectId;
+            if (projectIdToUpdate) {
+                parentProjectId = projectIdToUpdate;
+            } else {
+                const scriptData = JSON.parse(localStorage.getItem('scriptData'));
+                parentProjectId = scriptData.projectId;
+            }
+
+            const formGroups = document.querySelectorAll('.sentence-form-group');
+            const scriptsToSave = [];
+
+            formGroups.forEach((group, index) => {
+                const scriptData = {
+                    projectId: parentProjectId, // Add parent project ID to each sentence
+                    sentence: group.querySelector('.sentence-text').dataset.sentence,
+                    videoNumber: document.getElementById(`video-number-${index}`).value,
+                    details: document.getElementById(`details-${index}`).value
+                };
+                scriptsToSave.push(scriptData);
+            });
+
+            const payload = {
+                scriptsToSave: scriptsToSave,
+                projectIdToUpdate: projectIdToUpdate // This is null for new projects
+            };
+
+            fetch('/api/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            })
+            .then(response => response.json())
+            .then(data => {
+                localStorage.removeItem('scriptData');
+                alert(data.message);
+                window.location.href = '/';
+            })
+            .catch(console.error);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Video Script</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Enter New Video Script</h1>
+        
+        <label for="project-id"><b>Parent Project ID</b></label>
+        <input type="text" id="project-id" placeholder="e.g., CAMPAIGN_SUMMER_2025" required>
+        
+        <label for="full-script"><b>Full Script Text</b></label>
+        <p>Enter your full script below. Sentences will be split by periods (".").</p>
+        <textarea id="full-script" rows="15" placeholder="My ambition never dims. At the desk, I open my Macbook..."></textarea>
+        
+        <button id="generate-btn">Generate</button>
+    </div>
+
+    <script>
+        document.getElementById('generate-btn').addEventListener('click', () => {
+            const projectId = document.getElementById('project-id').value.trim();
+            const fullScript = document.getElementById('full-script').value;
+
+            if (!projectId) {
+                alert('Please enter a Parent Project ID.');
+                return;
+            }
+
+            const sentences = fullScript.split('.')
+                                      .map(s => s.trim())
+                                      .filter(s => s.length > 0);
+
+            if (sentences.length > 0) {
+                // Store both the project ID and sentences in localStorage
+                const scriptData = {
+                    projectId: projectId,
+                    sentences: sentences
+                };
+                localStorage.setItem('scriptData', JSON.stringify(scriptData));
+                window.location.href = '/manage';
+            } else {
+                alert('Please enter a script.');
+            }
+        });
+    </script>
+</body>
+</html>

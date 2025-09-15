@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Script Details</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .detail-item { margin-bottom: 15px; }
+        .detail-label { font-weight: bold; color: #555; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Script Details</h1>
+        <div id="script-details">
+            <p>Loading...</p>
+        </div>
+        <a href="/" class="button">Back to Home</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get the script ID from the URL (e.g., /detail/script_12345)
+            const scriptId = window.location.pathname.split('/').pop();
+            const detailsContainer = document.getElementById('script-details');
+
+            fetch(`/api/scripts/${scriptId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Script not found');
+                    }
+                    return response.json();
+                })
+                .then(script => {
+                    detailsContainer.innerHTML = `
+                        <div class="detail-item">
+                            <span class="detail-label">Sentence:</span>
+                            <p>${script.sentence}</p>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Video Number:</span>
+                            <p>${script.videoNumber || 'N/A'}</p>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Details:</span>
+                            <p>${script.details || 'No details provided.'}</p>
+                        </div>
+                         <div class="detail-item">
+                            <span class="detail-label">Date Saved:</span>
+                            <p>${script.date}</p>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    detailsContainer.innerHTML = `<p style="color: red;">${error.message}</p>`;
+                });
+        });
+    </script>
+</body>
+</html>
