@@ -5,6 +5,8 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000; 
+const dbPath = path.join(process.cwd(), "database.json");
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -19,7 +21,7 @@ app.get('/manage', (req, res) => res.sendFile(path.join(__dirname, 'views', 'man
 
 // GET all scripts
 app.get('/api/scripts', (req, res) => {
-    fs.readFile('database.json', 'utf8', (err, data) => {
+    fs.readFile(dbPath, 'utf8', (err, data) => {
         if (err) return res.status(500).json({ message: 'Error reading database' });
         res.json(JSON.parse(data).scripts);
     });
@@ -28,7 +30,7 @@ app.get('/api/scripts', (req, res) => {
 // UPDATED: Get all sentences for a specific PROJECT ID
 app.get('/api/scripts/project/:projectId', (req, res) => {
     const { projectId } = req.params;
-    fs.readFile('database.json', 'utf8', (err, data) => {
+    fs.readFile(dbPath, 'utf8', (err, data) => {
         if (err) return res.status(500).json({ message: 'Error reading database' });
         
         const scripts = JSON.parse(data).scripts;
@@ -41,7 +43,7 @@ app.get('/api/scripts/project/:projectId', (req, res) => {
 app.post('/api/save', (req, res) => {
     const { scriptsToSave, projectIdToUpdate } = req.body;
 
-    fs.readFile('database.json', 'utf8', (err, data) => {
+    fs.readFile(dbPath, 'utf8', (err, data) => {
         if (err) return res.status(500).json({ message: 'Error reading database' });
         
         const db = JSON.parse(data);
@@ -68,7 +70,7 @@ app.post('/api/save', (req, res) => {
             });
         });
 
-        fs.writeFile('database.json', JSON.stringify(db, null, 2), (err) => {
+        fs.writeFile(dbPath, JSON.stringify(db, null, 2), (err) => {
             if (err) return res.status(500).json({ message: 'Error saving to database' });
             res.status(200).json({ message: 'Project saved successfully!' });
         });
