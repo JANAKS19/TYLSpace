@@ -94,10 +94,10 @@
             const formGroups = document.querySelectorAll('.sentence-form-group');
             const scriptsToSave = [];
 
-            formGroups.forEach((group, index) => {
+           formGroups.forEach((group, index) => {
                 const scriptData = {
-                    projectId: parentProjectId, // Add parent project ID to each sentence
-                    sentence: group.querySelector('.sentence-text').dataset.sentence,
+                    projectId: parentProjectId,
+                    sentence: group.parentElement.querySelector('.sentence-text').dataset.sentence, // Fixed selector
                     videoNumber: document.getElementById(`video-number-${index}`).value,
                     details: document.getElementById(`details-${index}`).value
                 };
