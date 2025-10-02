@@ -10,8 +10,17 @@
     <div class="container">
         <h1 id="page-heading">Manage Script Sentences</h1>
         <form id="manage-form">
-            <div id="sentence-container">
+            <div class="timeline-wrapper">
+                <div class="fixed-labels">
+                    <div class="label-spacer"></div>
+                    <div class="form-labels">
+                        <div class="form-label">Video Number (Child):</div>
+                        <div class="form-label">Details:</div>
+                    </div>
                 </div>
+                <div id="sentence-container">
+                </div>
+            </div>
             <button type="submit" id="save-button">Save Project</button>
             <a href="/" style="margin-left: 10px;">Cancel</a>
         </form>
@@ -29,12 +38,13 @@
                 const details = isString ? '' : sentenceData.details;
 
                 const formGroup = `
-                    <div class="sentence-form-group">
-                        <p class="sentence-text" data-sentence="${sentenceText}">${index + 1}. ${sentenceText}</p>
-                        <label for="video-number-${index}">Video Number (Child):</label>
-                        <input type="text" id="video-number-${index}" value="${videoNumber}" placeholder="e.g., Scene_A1 (optional)">
-                        <label for="details-${index}">Details:</label>
-                        <input type="text" id="details-${index}" value="${details}" placeholder="e.g., Close up shot">
+                    <div class="sentence-timeline-item">
+                        <p class="sentence-text" data-sentence="${sentenceText}" title="${index + 1}. ${sentenceText}">${index + 1}. ${sentenceText}</p>
+                        ${index < sentences.length - 1 ? '<span class="arrow-right">➜</span>' : ''}
+                        <div class="sentence-form-group">
+                            <input type="text" id="video-number-${index}" value="${videoNumber}" placeholder="e.g., Scene_A1 (optional)">
+                            <input type="text" id="details-${index}" value="${details}" placeholder="e.g., Close up shot">
+                        </div>
                     </div>
                 `;
                 container.innerHTML += formGroup;
